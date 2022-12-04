@@ -27,5 +27,5 @@ module Day01 =
         let elfSums = finalSum :: elfSums |> List.sort |> List.rev
         elfSums |> List.take n |> List.sum
 
-    printfn "Top 3 sum = %i" (topN 3 lines)
+    printfn "Top 3 sum = %i" (topN 3 lines) 
 

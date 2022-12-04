@@ -32,4 +32,4 @@ let p2Answer =
     |> Array.filter isOverlapping
     |> Array.length
 
-printfn "Part1: %i" p2Answer //
+printfn "Part1: %i" p2Answer
