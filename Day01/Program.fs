@@ -1,7 +1,4 @@
-﻿// For more information see https://aka.ms/fsharp-console-apps
-printfn "Hello from F#"
-
-module Day01 =
+﻿module Day01 =
 
     let maxCals lines =
         let folder (elfSum, maxCals) s =

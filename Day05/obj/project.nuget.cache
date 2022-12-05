@@ -1,0 +1,10 @@
+{
+  "version": 2,
+  "dgSpecHash": "YFNuD7L4SOzXfFhOwT0axquPrtliynTphJmj9xRDLCOnpI9iwptbwZLcOjXoxunWklRlaeA3JAe91I1Fj7szRw==",
+  "success": true,
+  "projectFilePath": "/Users/paul/VS/AdventOfCode2022/Day05/Day05.fsproj",
+  "expectedPackageFiles": [
+    "/Users/paul/.nuget/packages/fsharp.core/7.0.0/fsharp.core.7.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
