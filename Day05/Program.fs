@@ -33,7 +33,12 @@ let getStacks()  =
 
     stacks
 
-// Now process the stacks
+// Utility function to print out top of stacks
+let printStackTops s =
+    s |> Array.map (fun l -> l |> List.head) |> Array.iter (fun c -> printf "%c" c)
+    printfn ""
+
+// Part 1
 let p1Stacks = getStacks()
 let mover9000 (numItems, iFromStack, iToStack) =
     let rec move numItems fromStack toStack =
@@ -47,13 +52,9 @@ let mover9000 (numItems, iFromStack, iToStack) =
     p1Stacks.[iToStack] <- toStack
 
 moves |> Array.iter mover9000
-
-let printStackTops s =
-    s |> Array.map (fun l -> l |> List.head) |> Array.iter (fun c -> printf "%c" c)
-    printfn ""
-
 p1Stacks |> printStackTops 
 
+// Part 2
 let p2Stacks = getStacks()
 let mover9001 (numItems, iFromStack, iToStack) =
     let toMove, newFromStack = p2Stacks.[iFromStack] |> List.splitAt numItems
