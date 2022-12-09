@@ -2,7 +2,6 @@
 open System.Collections.Generic
 
 module Day07 =
-
     let (|Regex|_|) pattern input =
         let m = Regex.Match(input, pattern)
         if m.Success then Some(List.tail [ for g in m.Groups -> g.Value ])
@@ -35,9 +34,6 @@ module Day07 =
         stack.Pop() |> ignore
         processDirectory("/")
 
-    let root = processStack()
-
-    // traverse over the directory tree, working out sizes of each directory
     let rec sumContainedFiles (root : FileSystem) =
         match root with
         | Directory(_, contents) ->
@@ -53,6 +49,7 @@ module Day07 =
             (if s <= 100000 then s else 0) + (contents |> List.sumBy sumBigDirectories) 
         | _ -> 0
 
+    let root = processStack() 
     printfn "Part 1 answer: %i" (sumBigDirectories root)
 
             
