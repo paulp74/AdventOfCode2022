@@ -52,6 +52,24 @@ module Day07 =
     let root = processStack() 
     printfn "Part 1 answer: %i" (sumBigDirectories root)
 
-            
+    let rec getDirectorySizes (root : FileSystem) =
+        match root with
+        | Directory(_, contents) as d ->
+            let s = sumContainedFiles d
+            s :: (contents |> List.collect getDirectorySizes)
+        | _ -> List.empty
 
+    let directorySizes = getDirectorySizes root
+
+    let totalUsed       = directorySizes |> List.max
+    let maxUsage        = 40000000
+    let spaceToDelete   = totalUsed - maxUsage
+
+    let sizeToDelete = 
+        directorySizes
+        |> List.filter (fun el -> el >= spaceToDelete)
+        |> List.sort
+        |> List.head
+
+    printfn "Part 2 answer: %i" sizeToDelete
 
