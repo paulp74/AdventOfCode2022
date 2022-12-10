@@ -1,16 +1,12 @@
 ﻿module Day09 =
-    let lines = System.IO.File.ReadAllLines(@"input.txt")
     let moves =
-        lines
+        System.IO.File.ReadAllLines(@"input.txt")
         |> Seq.map (fun s ->
                         let parts = s.Split(' ', System.StringSplitOptions.RemoveEmptyEntries)
                         parts.[0], int parts.[1])
 
     let getNewTailPosition (xH, yH) (xT, yT) =
         match xH-xT, yH-yT with
-        | 0, 0 -> (xT, yT)
-        | dx, 0 when abs dx > 1 -> (xT + 1 * sign(dx), yT)
-        | 0, dy when abs dy > 1 -> (xT, yT + 1 * sign(dy))
         | dx, dy when abs dx > 1 || abs dy > 1 -> (xT + 1 * sign(dx), yT + 1 * sign(dy))
         | _ -> (xT, yT)
 
