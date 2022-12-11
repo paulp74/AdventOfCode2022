@@ -20,79 +20,75 @@ module Day10 =
     let commands = lines |> List.map mapper
 
     let mutable x = 1
-    let p1folder ((currentCommand, cyclesLeft), commandsLeft, signalStrength) cycle =
+    let p1CycleFolder ((currentCommand, commandCycles), commandsLeft, signalStrength) cycle =
         let signalStrength = 
             if (cycle - 20)%40 = 0 then
                 signalStrength + cycle*x
             else
                 signalStrength
 
-        let cyclesLeft = cyclesLeft - 1
+        let commandCycles = commandCycles + 1
         let c, commandsLeft = 
-            if cyclesLeft = 0 then
-                // execute command
-                match currentCommand with
-                | Addx(_, v)    -> x <- x + v
-                | Noop(_)       -> ()
-
+            let getNext() =
                 match commandsLeft with
-                | h :: t -> match h with
-                            | Addx(c, _) -> (h, c), t
-                            | Noop(c)    -> (h, c), t
+                | h :: t -> (h, 0), t
                 | _ -> (Noop(1), 1), List.empty
-            else
-                (currentCommand, cyclesLeft), commandsLeft
-        
+
+            match currentCommand with
+            | Addx(c, v) when c = commandCycles ->
+                x <- x + v
+                getNext()
+            | Noop(c)    when c = commandCycles ->
+                ()
+                getNext()
+            | _ ->
+                (currentCommand, commandCycles), commandsLeft
+
         c, commandsLeft, signalStrength
 
     let getSolutionP1() =
-        let h = commands |> List.head
-        let t = commands |> List.tail
-
-        let c = match h with
-                | Addx(c, _) -> (h, c)
-                | Noop(c)    -> (h, c)
-
-        let _, _, signalStrength = [|1..220|] |> Array.fold p1folder (c, t, 0)
-        signalStrength
+        match commands with
+        | h::t ->
+            let _, _, signalStrength = [|1..220|] |> Array.fold p1CycleFolder ((h, 0), t, 0)
+            signalStrength
+        | _    ->
+            raise(System.ArgumentException("Expected more commands"))
 
     printfn "Part1: %i" (getSolutionP1())
 
     x <- 1
-    let p2folder ((currentCommand, cyclesLeft), commandsLeft, pixels) cycle =
+    let p2folder ((currentCommand, commandCycles), commandsLeft, pixels) cycle =
         let pixel = if abs(x-(cycle-1)%40) > 1 then " " else "#"
 
-        let cyclesLeft = cyclesLeft - 1
+        let commandCycles = commandCycles + 1
         let c, commandsLeft = 
-            if cyclesLeft = 0 then
-                // execute command
-                match currentCommand with
-                | Addx(_, v)    -> x <- x + v
-                | Noop(_)       -> ()
-
+            let getNext() =
                 match commandsLeft with
-                | h :: t -> match h with
-                            | Addx(c, _) -> (h, c), t
-                            | Noop(c)    -> (h, c), t
+                | h :: t -> (h, 0), t
                 | _ -> (Noop(1), 1), List.empty
-            else
-                (currentCommand, cyclesLeft), commandsLeft
+
+            match currentCommand with
+            | Addx(c, v) when c = commandCycles ->
+                x <- x + v
+                getNext()
+            | Noop(c)    when c = commandCycles ->
+                ()
+                getNext()
+            | _ ->
+                (currentCommand, commandCycles), commandsLeft
         
         c, commandsLeft, pixel::pixels
 
     let getSolutionP2() =
-        let h = commands |> List.head
-        let t = commands |> List.tail
-
-        let c = match h with
-                | Addx(c, _) -> (h, c)
-                | Noop(c)    -> (h, c)
-
-        let _, _, pixels = [|1..240|] |> Array.fold p2folder (c, t, List.empty)
-        pixels
-        |> List.rev
-        |> List.chunkBySize 40
-        |> List.map (fun el -> el |> String.concat "")
-        |> List.iter (printfn "%s")
+        match commands with
+        | h::t ->
+            let _, _, pixels = [|1..240|] |> Array.fold p2folder ((h, 0), t, List.empty)
+            pixels
+            |> List.rev
+            |> List.chunkBySize 40
+            |> List.map (fun el -> el |> String.concat "")
+            |> List.iter (printfn "%s")
+        | _    ->
+            raise(System.ArgumentException("Expected more commands"))
 
     getSolutionP2() 
