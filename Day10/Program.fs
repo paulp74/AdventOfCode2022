@@ -8,52 +8,42 @@ module Day10 =
         else None
 
     type Command =
-        | Noop of cycles : int
-        | Addx of cycles : int * v : int
+        | Noop
+        | Addx of v : int
 
-    let lines = System.IO.File.ReadAllLines(@"input.txt") |> List.ofArray
     let mapper s =
         match s with
-        | Regex @"addx (.*)" [ v ] -> Addx(2, int v)
-        | Regex @"noop" _ -> Noop(1)
+        | Regex @"addx (.*)" [ v ] -> [ Noop; Addx(int v)] // Adding in extra null ops really simplifies the folder logic
+        | Regex @"noop" _ -> [ Noop ]
         | _ -> raise(System.ArgumentException(sprintf "Unexpected command %s" s))
 
-    let commands = lines |> List.map mapper
+    let denormalisedCommands =
+        System.IO.File.ReadAllLines(@"input.txt")
+        |> List.ofArray
+        |> List.collect mapper
 
     let mutable x = 1
-    let genericCycleFolder f ((currentCommand, commandCycles), commandsLeft, argF) cycle =
+    let genericCycleFolder f (currentCommand, commandsLeft, argF) cycle =
         let outF = f cycle x argF // act upon value of X to update acc
 
-        let commandCycles = commandCycles + 1
-        let c, commandsLeft = 
-            let getNext() =
-                match commandsLeft with
-                | h :: t -> (h, 0), t
-                | _ -> (Noop(1), 1), List.empty
-
-            match currentCommand with
-            | Addx(c, v) when c = commandCycles ->
-                x <- x + v
-                getNext()
-            | Noop(c)    when c = commandCycles ->
-                ()
-                getNext()
-            | _ ->
-                (currentCommand, commandCycles), commandsLeft
-        c, commandsLeft, outF
+        match currentCommand with
+        | Addx(v)   -> x <- x + v
+        | Noop      -> ()
+               
+        match commandsLeft with
+        | h :: t    -> h, t, outF
+        | _         -> Noop, List.empty, outF
 
     // Part 1
     x <- 1
     let signalStrength' cycle x signalStrength =
-            if (cycle - 20)%40 = 0 then
-                signalStrength + cycle*x
-            else
-                signalStrength
-    let p1CycleFolder' = genericCycleFolder signalStrength'
+            signalStrength + if (cycle - 20)%40 = 0 then cycle*x else 0
+
+    let p1CycleFolder = genericCycleFolder signalStrength'
     let getSolutionP1'() =
-        match commands with
+        match denormalisedCommands with
         | h::t ->
-            let _, _, signalStrength = [|1..220|] |> Array.fold p1CycleFolder' ((h, 0), t, 0)
+            let _, _, signalStrength = [|1..220|] |> Array.fold p1CycleFolder (h, t, 0)
             signalStrength
         | _    ->
             raise(System.ArgumentException("Expected more commands"))
@@ -62,11 +52,11 @@ module Day10 =
     // Part 2
     x <- 1
     let pixels' cycle x pixels = (if abs(x-(cycle-1)%40) > 1 then " " else "#") :: pixels
-    let p2CycleFolder' = genericCycleFolder pixels'
+    let p2CycleFolder = genericCycleFolder pixels'
 
-    match commands with
+    match denormalisedCommands with
     | h::t ->
-        let _, _, pixels = [|1..240|] |> Array.fold p2CycleFolder' ((h, 0), t, List.empty)
+        let _, _, pixels = [|1..240|] |> Array.fold p2CycleFolder (h, t, List.empty)
         pixels
         |> List.rev
         |> List.chunkBySize 40
